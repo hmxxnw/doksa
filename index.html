@@ -1,39 +1,891 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>문학 시험 대비 주관식 퀴즈</title><style>
-:root{color-scheme:dark;--bg:#151514;--panel:#232220;--line:#3c3935;--txt:#f2f0ed;--muted:#aaa39a;--blue:#9dbced}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,'Noto Sans KR',sans-serif;line-height:1.6}.wrap{max-width:780px;margin:0 auto;padding:34px 20px 80px}h1{font-size:28px;margin:0 0 3px;letter-spacing:-.8px}.sub{color:var(--muted);font-size:14px;margin:0 0 24px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:22px;margin:14px 0}.label{font-size:13px;color:var(--muted);font-weight:700;margin:0 0 12px}.choices{display:flex;flex-wrap:wrap;gap:9px}.chip{background:#242e40;border:1px solid #7e9fce;color:#b4cefa;padding:9px 15px;border-radius:24px;cursor:pointer;font-weight:650;font-size:14px}.chip.active{background:#a0bdeb;color:#14233a;border-color:#a0bdeb}.chip:focus-visible,button:focus-visible,textarea:focus-visible{outline:3px solid #fff;outline-offset:2px}.stats{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:13px}.bar{height:7px;background:#3a3835;border-radius:8px;overflow:hidden;margin:12px 0 25px}.fill{height:100%;background:#95b7ed;transition:width .2s}.question{font-size:21px;font-weight:750;line-height:1.55;margin:14px 0 22px;word-break:keep-all}.tag{color:#9dbced;font-size:13px;font-weight:700}.answer{width:100%;min-height:112px;border-radius:12px;background:#191919;border:1px solid #56514c;color:var(--txt);font:inherit;padding:15px;resize:vertical}.btn{border:0;border-radius:12px;padding:14px 18px;font-weight:750;font-size:15px;cursor:pointer;background:#95b5e6;color:#18253a}.btn.secondary{background:transparent;color:#ddd;border:1px solid #514d48}.btn:disabled{opacity:.3;cursor:not-allowed}.btnrow{display:flex;gap:10px;margin-top:14px}.btnrow>*{flex:1}.result{margin-top:17px;padding:17px;background:#30302d;border-radius:12px;border:1px solid #57534c}.result strong{color:#b6d0ff}.result p{margin:7px 0 0}.small{font-size:13px;color:var(--muted)}.footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}.toggle{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}select{background:#252525;border:1px solid #57534c;color:white;border-radius:8px;padding:8px}.hidden{display:none}button:hover:not(:disabled){filter:brightness(1.09)}@media(max-width:500px){.wrap{padding:22px 14px 55px}h1{font-size:24px}.panel{padding:17px}.question{font-size:19px}}
-.grade{display:flex;gap:10px;margin-top:12px}.grade button{flex:1}.grade .selected{outline:2px solid #fff;outline-offset:2px}.reviewbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}.empty{text-align:center;color:var(--muted);padding:20px}.mode-label{color:#b6d0ff;font-size:13px;font-weight:700;margin-top:10px}
-</style></head><body><main class="wrap"><h1>문학 시험 대비 주관식 퀴즈</h1><p class="sub">이강백 「파수꾼」 · 이청준 「소문의 벽」 — 학습 가이드 기반, 줄거리 제외</p><section class="panel"><div class="label">작품 선택</div><div class="choices" id="works"></div><div class="reviewbar"><button class="chip active" id="allmode">전체 문제 풀기</button><button class="chip" id="wrongmode">오답만 다시 풀기 (<span id="wrongcount">0</span>)</button></div><div class="mode-label" id="modeLabel"></div><p class="label" style="margin:18px 0 9px">출제 순서</p><div class="choices"><button class="chip active" id="ordered">순서대로</button><button class="chip" id="random">랜덤</button></div></section><section class="panel"><div class="stats"><span id="counter"></span><span id="progress"></span></div><div class="bar"><div class="fill" id="fill"></div></div><div class="tag" id="tag"></div><div class="empty hidden" id="empty">이 작품에 다시 풀 오답이 없어요. 전체 문제로 돌아가거나 작품 선택을 변경해 주세요.</div><div id="questionArea"><div class="question" id="question"></div><label for="answer" class="label">직접 답안을 작성해 보세요</label><textarea class="answer" id="answer" placeholder="여기에 정답을 입력하세요"></textarea><div class="btnrow"><button class="btn" id="reveal">정답 및 해설 확인</button></div><div class="result hidden" id="result"><strong id="correct"></strong><p id="explanation"></p><p class="small">서술형은 다양한 표현이 가능하므로 모범 답안과 직접 비교해 주세요.</p><div class="grade"><button class="btn secondary" id="markwrong">틀렸어요</button><button class="btn" id="markright">맞혔어요</button></div></div><div class="btnrow"><button class="btn secondary" id="prev">← 이전</button><button class="btn" id="next">다음 →</button></div></div></section><div class="footer"><label class="toggle"><input type="checkbox" id="showall">정답 항상 표시</label><button class="btn secondary" id="reset">진행 기록 초기화</button></div><p class="small" style="margin-top:23px">※ 이 페이지는 첨부된 두 학습 가이드를 바탕으로 작성한 독립형 학습용 페이지입니다. 답안과 진행 기록은 현재 브라우저에만 저장됩니다.</p></main><script>
-const DATA=[{"section": "파수꾼", "q": "「파수꾼」의 문학적 갈래를 세 가지 쓰시오.", "a": "희곡, 단막극, 우화극(알레고리극)", "ex": "무대 상연을 전제로 한 단막 우화극이다."}, {"section": "파수꾼", "q": "「파수꾼」이 비판하는 시대적 정치 체제는?", "a": "1970년대 유신 체제", "ex": "작품은 권위주의적 통치와 공포 정치를 우화적으로 비판한다."}, {"section": "파수꾼", "q": "동물·사물·가상의 상황을 통해 현실을 간접적으로 풍자하는 극을 무엇이라고 하는가?", "a": "우화극(알레고리극)", "ex": "이리 떼와 망루는 현실 비판을 위한 상징적 소재다."}, {"section": "파수꾼", "q": "막이 오르기 전 등장인물·무대·시공간 등을 설명하는 희곡의 구성 요소는?", "a": "해설", "ex": "해설은 작품의 기본적인 무대 상황을 알려 준다."}, {"section": "파수꾼", "q": "대사 앞뒤 괄호 안에서 인물의 동작·표정·말투 등을 지시하는 글은?", "a": "동작 지시문", "ex": "인물의 심리와 긴장을 간접적으로 드러낸다."}, {"section": "파수꾼", "q": "무대 위 다른 인물에게는 들리지 않고 관객에게만 건네는 말은?", "a": "방백", "ex": "관객만 속마음을 알게 되어 극적 아이러니를 만들 수 있다."}, {"section": "파수꾼", "q": "희곡의 일반적인 5단 구성을 순서대로 쓰시오.", "a": "발단 → 전개 → 절정 → 하강 → 대단원", "ex": "갈등의 고조와 해소를 중심으로 전개된다."}, {"section": "파수꾼", "q": "관객을 극 속 인물로 끌어들여 무대와 객석의 경계를 허무는 연출은?", "a": "제4의 벽 깨기(무대와 객석의 경계 허물기)", "ex": "「파수꾼」에서는 관객이 마을 사람으로 호명된다."}, {"section": "파수꾼", "q": "작품에서 ‘이리 떼’의 상징적 의미는?", "a": "권력이 만들어 낸 허구의 적, 조작된 공포", "ex": "공포를 통해 사람들을 결속시키고 복종하게 한다."}, {"section": "파수꾼", "q": "작품에서 ‘흰 구름’의 상징적 의미는?", "a": "허구 뒤에 가려진 진실, 순수하고 아름다운 현실", "ex": "‘이리 떼’라는 거짓과 대비된다."}, {"section": "파수꾼", "q": "‘양철 북’이 상징하는 사회적 기능은?", "a": "공포를 확산·증폭하는 선전과 여론 조작", "ex": "북소리는 공포 체제가 지속되는 분위기도 만든다."}, {"section": "파수꾼", "q": "작품에서 ‘덫’의 상징적 의미는?", "a": "실체 없는 적을 잡으려는 헛된 노력", "ex": "빈 덫을 보고도 이리가 교활하다고 여기며 공포를 유지한다."}, {"section": "파수꾼", "q": "촌장이 약속하는 ‘내일’의 상징적 의미는?", "a": "끝없이 유예되는 기만적 약속", "ex": "진실 공개를 계속 미루는 권력의 화법이다."}, {"section": "파수꾼", "q": "파수꾼을 ‘가·나·다’로 부르는 방식의 효과는?", "a": "익명성·보편성 강조, 체제 속 개인의 몰개성화", "ex": "관객 누구나 그 자리에 설 수 있음을 암시한다."}, {"section": "파수꾼", "q": "파수꾼 ‘가’, ‘나’, ‘다’가 각각 상징하는 태도를 순서대로 쓰시오.", "a": "침묵하는 공범 / 맹신하는 순응자 / 진실을 발견했으나 굴복하는 개인", "ex": "서로 다른 방식으로 공포 체제에 편입된다."}, {"section": "파수꾼", "q": "촌장이 보여 주는 통치 방식은?", "a": "허구의 공포 조성, 회유와 협박을 통한 지배", "ex": "공포가 단결과 질서를 지킨다고 정당화한다."}, {"section": "파수꾼", "q": "운반인이 대표하는 인간 유형은?", "a": "이해타산적·기회주의적 인간", "ex": "진실 여부보다 자기 이익을 앞세운다."}, {"section": "파수꾼", "q": "진실을 본 인물이 오히려 거짓을 외치는 표현 방식은?", "a": "반어(아이러니)", "ex": "진실이 권력에 의해 뒤집히는 비극을 강조한다."}, {"section": "소문의 벽", "q": "「소문의 벽」의 서사 구조는?", "a": "액자 소설 구조", "ex": "‘나’의 추적 속에 박준의 소설과 인터뷰 등이 삽입된다."}, {"section": "소문의 벽", "q": "「소문의 벽」의 발표 문예지와 연도는?", "a": "『문학과지성』, 1971년 여름호", "ex": "학습 가이드 작품 개요에 제시되어 있다."}, {"section": "소문의 벽", "q": "박준이 갈망하지만 외부 억압으로 좌절되는 것은?", "a": "정직한 자기 진술의 자유", "ex": "소설 쓰기는 박준에게 가장 성실한 자기 진술이다."}, {"section": "소문의 벽", "q": "박준의 ‘전짓불’이 상징하는 것은?", "a": "정체를 숨긴 익명의 권력, 검열과 일방적 진술 강요", "ex": "불빛 뒤의 존재는 정체를 숨긴 채 진술을 요구한다."}, {"section": "소문의 벽", "q": "‘소문의 벽’이 작동하는 핵심적인 억압 방식은?", "a": "소문과 제재에 대한 두려움에서 비롯되는 자기 검열", "ex": "실제 제재 이전에 스스로 표현을 억제하게 만든다."}, {"section": "소문의 벽", "q": "박준이 광기 속으로 도피하려는 이유는?", "a": "진술 강요와 외부 압박에서 자신을 보호하기 위해", "ex": "광기는 전짓불로부터 벗어나려는 피난처다."}, {"section": "소문의 벽", "q": "피난처였던 정신병원이 박준에게 감옥이 되는 이유는?", "a": "김 박사가 병원에서도 자기 진술을 강요하기 때문에", "ex": "공포에서 벗어나려던 장소가 다시 억압의 공간이 된다."}, {"section": "소문의 벽", "q": "김 박사의 태도를 대표하는 두 가지 특징은?", "a": "권위주의적 태도, 실용주의적·공리주의적 태도", "ex": "환자의 내면보다 자신의 이론과 치료 효용을 앞세운다."}, {"section": "소문의 벽", "q": "김 박사가 박준의 소설을 치료 자료로 인정하지 않는 이유는?", "a": "꾸며낸 이야기로 치부하고 직접적인 자기 진술만 중시하기 때문에", "ex": "‘나’는 소설을 박준의 내면 진실을 담은 자료로 읽는다."}, {"section": "소문의 벽", "q": "‘나’와 김 박사가 박준을 대하는 관점의 차이는?", "a": "‘나’: 공감적·수용적 관점 / 김 박사: 도구적·권위적 관점", "ex": "환자의 고통을 이해하는 방식에서 대립한다."}, {"section": "소문의 벽", "q": "안 형의 원고 게재 보류가 상징하는 것은?", "a": "자기 기준과 소문에 대한 두려움에서 비롯된 지적 검열", "ex": "필자의 의도를 인정하지 않고 말썽을 우려한다."}, {"section": "소문의 벽", "q": "김 박사의 ‘시행착오’라는 말에서 드러나는 태도는?", "a": "개인의 고통과 운명을 다른 사람을 위한 효용의 수단으로 삼는 태도", "ex": "박준의 불상사를 다른 환자에게 유익한 경험으로 정당화한다."}];
-const $=id=>document.getElementById(id);
-let work='전체',random=false,index=0,order=[],answers={},seen={},grades={},mode='all';
-try {const s=JSON.parse(localStorage.getItem('literatureQuizV1')||'{}');answers=s.answers||{};seen=s.seen||{};grades=s.grades||{}}catch(e){}
-function save(){try{localStorage.setItem('literatureQuizV1',JSON.stringify({answers,seen,grades}))}catch(e){}}
-function filtered(){return DATA.map((_,i)=>i).filter(i=>(work==='전체'||DATA[i].section===work)&&(mode==='all'||grades[i]==='wrong'))}
-function countWrong(){return DATA.filter((q,i)=>grades[i]==='wrong'&&(work==='전체'||q.section===work)).length}
-function makeOrder(){order=filtered();if(random){for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}}index=0;render()}
-function workButtons(){const root=$('works');root.innerHTML='';['전체','파수꾼','소문의 벽'].forEach(w=>{const b=document.createElement('button');b.className='chip'+(work===w?' active':'');b.textContent=w+' ('+(w==='전체'?DATA.length:DATA.filter(q=>q.section===w).length)+')';b.onclick=()=>{work=w;workButtons();makeOrder()};root.appendChild(b)})}
-function render(){
- $('wrongcount').textContent=countWrong();$('allmode').classList.toggle('active',mode==='all');$('wrongmode').classList.toggle('active',mode==='wrong');$('modeLabel').textContent=mode==='wrong'?'오답 복습 모드 — 다시 맞히면 오답 목록에서 제외됩니다.':'';
- const empty=order.length===0;$('empty').classList.toggle('hidden',!empty);$('questionArea').classList.toggle('hidden',empty);$('counter').textContent=empty?'문제 0 / 0':`문제 ${index+1} / ${order.length}`;$('progress').textContent=`오답 ${countWrong()}문항`;
- $('fill').style.width=empty?'0%':((index+1)/order.length*100)+'%';if(empty){$('tag').textContent='';return}
- const id=order[index],q=DATA[id];$('tag').textContent=q.section;$('question').textContent=q.q;$('answer').value=answers[id]||'';$('prev').disabled=index===0;$('next').disabled=index===order.length-1;
- const visible=!!seen[id]||$('showall').checked;$('result').classList.toggle('hidden',!visible);$('correct').textContent='모범 답안: '+q.a;$('explanation').textContent=q.ex;$('reveal').textContent=visible?'정답 확인 완료':'정답 및 해설 확인';
- $('markwrong').classList.toggle('selected',grades[id]==='wrong');$('markright').classList.toggle('selected',grades[id]==='right');
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문학 시험 대비 주관식 퀴즈</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #151514;
+  --panel: #232220;
+  --line: #3c3935;
+  --txt: #f2f0ed;
+  --muted: #aaa39a;
+  --blue: #9dbced;
 }
-function grade(value){if(!order.length)return;const id=order[index];grades[id]=value;seen[id]=true;save();if(mode==='wrong'&&value==='right'){
- order.splice(index,1);if(index>=order.length)index=Math.max(0,order.length-1);
-}render()}
-$('answer').addEventListener('input',e=>{answers[order[index]]=e.target.value;save()});
-$('reveal').onclick=()=>{if(!order.length)return;seen[order[index]]=true;save();render()};
-$('markwrong').onclick=()=>grade('wrong');$('markright').onclick=()=>grade('right');
-$('prev').onclick=()=>{if(index>0){index--;render()}};$('next').onclick=()=>{if(index<order.length-1){index++;render()}};
-$('showall').onchange=render;$('ordered').onclick=()=>{random=false;$('ordered').classList.add('active');$('random').classList.remove('active');makeOrder()};
-$('random').onclick=()=>{random=true;$('random').classList.add('active');$('ordered').classList.remove('active');makeOrder()};
-$('allmode').onclick=()=>{mode='all';makeOrder()};$('wrongmode').onclick=()=>{mode='wrong';makeOrder()};
-$('reset').onclick=()=>{if(confirm('입력한 답안, 정답 확인 기록, 오답 표시를 모두 지울까요?')){answers={};seen={};grades={};save();makeOrder()}};
-workButtons();makeOrder();
-document.addEventListener('keydown', function(event) {
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--txt);
+  font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
+  line-height: 1.6;
+}
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 34px 20px 80px;
+}
+h1 { font-size: 28px; margin: 0 0 3px; }
+.sub { color: var(--muted); font-size: 14px; margin: 0 0 24px; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 22px;
+  margin: 14px 0;
+}
+.label {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+.choices, .reviewbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.reviewbar { margin-top: 15px; }
+.chip {
+  background: #242e40;
+  border: 1px solid #7e9fce;
+  color: #b4cefa;
+  padding: 9px 15px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-weight: 650;
+  font-size: 14px;
+}
+.chip.active {
+  background: #a0bdeb;
+  color: #14233a;
+}
+.stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.bar {
+  height: 7px;
+  background: #3a3835;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0 25px;
+}
+.fill {
+  height: 100%;
+  background: #95b7ed;
+  transition: width .2s;
+}
+.question {
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.55;
+  margin: 14px 0 22px;
+  word-break: keep-all;
+}
+.tag {
+  color: #9dbced;
+  font-size: 13px;
+  font-weight: 700;
+}
+.answer {
+  width: 100%;
+  min-height: 112px;
+  border-radius: 12px;
+  background: #191919;
+  border: 1px solid #56514c;
+  color: var(--txt);
+  font: inherit;
+  padding: 15px;
+  resize: vertical;
+}
+.btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-weight: 750;
+  font-size: 15px;
+  cursor: pointer;
+  background: #95b5e6;
+  color: #18253a;
+}
+.btn.secondary {
+  background: transparent;
+  color: #ddd;
+  border: 1px solid #514d48;
+}
+.btn:disabled {
+  opacity: .3;
+  cursor: not-allowed;
+}
+.btnrow, .grade {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.btnrow > *, .grade > * { flex: 1; }
+.result {
+  margin-top: 17px;
+  padding: 17px;
+  background: #30302d;
+  border-radius: 12px;
+  border: 1px solid #57534c;
+}
+.result strong { color: #b6d0ff; }
+.result p { margin: 7px 0 0; }
+.small { font-size: 13px; color: var(--muted); }
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.mode-label {
+  color: #b6d0ff;
+  font-size: 13px;
+  margin-top: 10px;
+}
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 20px;
+}
+.grade .selected {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.hidden { display: none !important; }
+button:hover:not(:disabled) { filter: brightness(1.09); }
+button:focus-visible, textarea:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 2px;
+}
+@media(max-width:500px) {
+  .wrap { padding: 22px 14px 55px; }
+  h1 { font-size: 24px; }
+  .panel { padding: 17px; }
+  .question { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <h1>문학 시험 대비 주관식 퀴즈</h1>
+  <p class="sub">
+    이강백 「파수꾼」 · 이청준 「소문의 벽」
+    — 줄거리 제외 · 총 44문제
+  </p>
+
+  <section class="panel">
+    <div class="label">작품 선택</div>
+    <div class="choices" id="works"></div>
+
+    <div class="reviewbar">
+      <button class="chip active" id="allmode">전체 문제 풀기</button>
+      <button class="chip" id="wrongmode">
+        오답만 다시 풀기 (<span id="wrongcount">0</span>)
+      </button>
+    </div>
+    <div class="mode-label" id="modeLabel"></div>
+
+    <p class="label" style="margin:18px 0 9px">출제 순서</p>
+    <div class="choices">
+      <button class="chip active" id="ordered">순서대로</button>
+      <button class="chip" id="random">랜덤</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="stats">
+      <span id="counter"></span>
+      <span id="progress"></span>
+    </div>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="tag" id="tag"></div>
+
+    <div class="empty hidden" id="empty">
+      다시 풀 오답이 없어요.<br>
+      전체 문제로 돌아가거나 작품을 변경해 주세요.
+    </div>
+
+    <div id="questionArea">
+      <div class="question" id="question"></div>
+      <label class="label" for="answer">
+        직접 답안을 작성해 보세요
+      </label>
+      <textarea
+        class="answer"
+        id="answer"
+        placeholder="여기에 정답을 입력하세요"
+      ></textarea>
+
+      <div class="btnrow">
+        <button class="btn" id="reveal">
+          정답 및 해설 확인
+        </button>
+      </div>
+
+      <div class="result hidden" id="result">
+        <strong id="correct"></strong>
+        <p id="explanation"></p>
+        <p class="small">
+          서술형은 모범 답안과 의미를 비교해 직접 채점해 주세요.
+        </p>
+        <div class="grade">
+          <button class="btn secondary" id="markwrong">
+            틀렸어요
+          </button>
+          <button class="btn" id="markright">
+            맞혔어요
+          </button>
+        </div>
+      </div>
+
+      <div class="btnrow">
+        <button class="btn secondary" id="prev">← 이전</button>
+        <button class="btn" id="next">다음 →</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    <label class="toggle">
+      <input type="checkbox" id="showall">
+      정답 항상 표시
+    </label>
+    <button class="btn secondary" id="reset">
+      진행 기록 초기화
+    </button>
+  </div>
+
+  <p class="small" style="margin-top:23px">
+    Enter: 정답 확인 / 다음 문제 · Shift+Enter: 줄바꿈<br>
+    답안과 채점 기록은 현재 브라우저에 저장됩니다.
+  </p>
+</main>
+
+<script>
+const DATA = [
+  {
+    section:"파수꾼",
+    q:"「파수꾼」의 문학적 갈래를 세 가지 쓰시오.",
+    a:"희곡, 단막극, 우화극(알레고리극)",
+    ex:"무대 상연을 전제로 한 단막 우화극이다."
+  },
+  {
+    section:"파수꾼",
+    q:"「파수꾼」이 비판하는 시대적 정치 체제는?",
+    a:"1970년대 유신 체제",
+    ex:"권위주의적 통치와 공포 정치를 우화적으로 비판한다."
+  },
+  {
+    section:"파수꾼",
+    q:"동물·사물·가상의 상황을 통해 현실을 간접적으로 풍자하는 극은?",
+    a:"우화극(알레고리극)",
+    ex:"상징적 소재로 현실의 문제를 드러낸다."
+  },
+  {
+    section:"파수꾼",
+    q:"막이 오르기 전 등장인물·무대·시공간 등을 설명하는 희곡의 구성 요소는?",
+    a:"해설",
+    ex:"작품의 기본적인 무대 상황을 알려 준다."
+  },
+  {
+    section:"파수꾼",
+    q:"대사 앞뒤 괄호 안에서 동작·표정·말투 등을 지시하는 글은?",
+    a:"동작 지시문",
+    ex:"인물의 심리와 긴장을 간접적으로 드러낸다."
+  },
+  {
+    section:"파수꾼",
+    q:"무대 위 다른 인물에게는 들리지 않고 관객에게만 건네는 말은?",
+    a:"방백",
+    ex:"관객에게만 인물의 속마음을 전달할 수 있다."
+  },
+  {
+    section:"파수꾼",
+    q:"희곡의 일반적인 5단 구성을 순서대로 쓰시오.",
+    a:"발단 → 전개 → 절정 → 하강 → 대단원",
+    ex:"갈등의 고조와 해소를 중심으로 전개된다."
+  },
+  {
+    section:"파수꾼",
+    q:"관객을 극 속 인물로 끌어들여 무대와 객석의 경계를 허무는 연출은?",
+    a:"제4의 벽 깨기",
+    ex:"관객을 마을 사람으로 호명하는 방식이 활용된다."
+  },
+  {
+    section:"파수꾼",
+    q:"작품에서 '이리 떼'의 상징적 의미는?",
+    a:"권력이 만들어 낸 허구의 적, 조작된 공포",
+    ex:"공포를 통해 사람들을 복종하게 한다."
+  },
+  {
+    section:"파수꾼",
+    q:"작품에서 '흰 구름'의 상징적 의미는?",
+    a:"허구 뒤에 가려진 진실, 순수하고 아름다운 현실",
+    ex:"'이리 떼'라는 거짓과 대비된다."
+  },
+  {
+    section:"파수꾼",
+    q:"'양철 북'이 상징하는 사회적 기능은?",
+    a:"공포를 확산하는 선전과 여론 조작",
+    ex:"북소리는 공포 체제가 지속되는 분위기를 만든다."
+  },
+  {
+    section:"파수꾼",
+    q:"작품에서 '덫'의 상징적 의미는?",
+    a:"실체 없는 적을 잡으려는 헛된 노력",
+    ex:"빈 덫조차 공포를 유지하는 구실이 된다."
+  },
+  {
+    section:"파수꾼",
+    q:"촌장이 약속하는 '내일'의 상징적 의미는?",
+    a:"끝없이 유예되는 기만적 약속",
+    ex:"진실 공개를 계속 미루는 권력의 화법이다."
+  },
+  {
+    section:"파수꾼",
+    q:"파수꾼을 '가·나·다'로 부르는 방식의 효과는?",
+    a:"익명성·보편성 강조, 개인의 몰개성화",
+    ex:"누구나 그 자리에 설 수 있음을 암시한다."
+  },
+  {
+    section:"파수꾼",
+    q:"파수꾼 '가', '나', '다'가 각각 상징하는 태도를 쓰시오.",
+    a:"침묵하는 공범 / 맹신하는 순응자 / 진실을 발견했으나 굴복하는 개인",
+    ex:"공포 체제에 편입되는 서로 다른 모습을 나타낸다."
+  },
+  {
+    section:"파수꾼",
+    q:"촌장이 보여 주는 통치 방식은?",
+    a:"허구의 공포 조성, 회유와 협박을 통한 지배",
+    ex:"공포를 질서 유지의 명분으로 삼는다."
+  },
+  {
+    section:"파수꾼",
+    q:"운반인이 대표하는 인간 유형은?",
+    a:"이해타산적·기회주의적 인간",
+    ex:"진실보다 자신의 이익을 앞세운다."
+  },
+  {
+    section:"파수꾼",
+    q:"진실을 본 인물이 오히려 거짓을 외치는 표현 방식은?",
+    a:"반어(아이러니)",
+    ex:"권력에 의해 진실이 뒤집히는 비극을 강조한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"「소문의 벽」의 서사 구조는?",
+    a:"액자 소설 구조",
+    ex:"'나'의 탐색 속에 박준의 소설 등이 삽입된다."
+  },
+  {
+    section:"소문의 벽",
+    q:"「소문의 벽」의 발표 문예지와 연도는?",
+    a:"『문학과지성』, 1971년 여름호",
+    ex:"작품의 발표 정보이다."
+  },
+  {
+    section:"소문의 벽",
+    q:"박준이 갈망하지만 외부 억압으로 좌절되는 것은?",
+    a:"정직한 자기 진술의 자유",
+    ex:"소설 쓰기는 박준에게 중요한 자기 진술 방식이다."
+  },
+  {
+    section:"소문의 벽",
+    q:"박준의 '전짓불'이 상징하는 것은?",
+    a:"익명의 권력, 검열과 일방적 진술 강요",
+    ex:"정체를 숨긴 존재가 진술을 요구한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"'소문의 벽'이 작동하는 핵심적인 억압 방식은?",
+    a:"소문과 제재에 대한 두려움에서 비롯되는 자기 검열",
+    ex:"실제 제재 이전에 스스로 표현을 억제한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"박준이 광기 속으로 도피하려는 이유는?",
+    a:"진술 강요와 외부 압박에서 자신을 보호하기 위해",
+    ex:"광기는 전짓불로부터 벗어나려는 피난처다."
+  },
+  {
+    section:"소문의 벽",
+    q:"정신병원이 박준에게 감옥이 되는 이유는?",
+    a:"김 박사가 병원에서도 자기 진술을 강요하기 때문에",
+    ex:"피난처가 다시 억압의 공간이 된다."
+  },
+  {
+    section:"소문의 벽",
+    q:"김 박사의 태도를 대표하는 두 가지 특징은?",
+    a:"권위주의적 태도, 실용주의적·공리주의적 태도",
+    ex:"환자의 내면보다 자신의 치료 이론을 앞세운다."
+  },
+  {
+    section:"소문의 벽",
+    q:"김 박사가 박준의 소설을 치료 자료로 인정하지 않는 이유는?",
+    a:"꾸며낸 이야기로 치부하고 직접적인 자기 진술만 중시하기 때문에",
+    ex:"'나'는 소설에도 내면의 진실이 담겼다고 본다."
+  },
+  {
+    section:"소문의 벽",
+    q:"'나'와 김 박사가 박준을 대하는 관점의 차이는?",
+    a:"'나': 공감적·수용적 / 김 박사: 도구적·권위적",
+    ex:"타인의 고통을 이해하는 방식에서 차이가 있다."
+  },
+  {
+    section:"소문의 벽",
+    q:"안 형의 원고 게재 보류가 상징하는 것은?",
+    a:"소문에 대한 두려움에서 비롯된 지적 검열",
+    ex:"말썽을 우려하여 필자의 표현을 제한한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"김 박사의 '시행착오'라는 말에서 드러나는 태도는?",
+    a:"개인의 고통을 다른 사람을 위한 효용의 수단으로 삼는 태도",
+    ex:"박준의 불상사를 다른 환자를 위한 경험으로 정당화한다."
+  },
+
+  // 추가 문제 14개
+  {
+    section:"파수꾼",
+    q:"촌장이 진실보다 거짓을 선택하는 행위에 나타난 모순을 서술하시오.",
+    a:"공동체의 안전과 질서를 지킨다는 명분으로 거짓을 퍼뜨리지만, 실제로는 사람들의 자유로운 판단을 억압하고 권력을 유지한다.",
+    ex:"질서 유지라는 명분과 권력 유지라는 실제 목적의 모순이 핵심이다."
+  },
+  {
+    section:"파수꾼",
+    q:"'다'가 진실을 발견하고도 끝까지 밝히지 못하는 이유를 권력과 개인의 관계에서 설명하시오.",
+    a:"권력자의 회유와 압박을 받는 개인은 진실을 알고 있더라도 자신의 신념을 지키기 어렵기 때문이다.",
+    ex:"권력 앞에서 개인이 겪는 무력함을 보여 준다."
+  },
+  {
+    section:"파수꾼",
+    q:"'이리 떼'의 존재를 직접 보여 주지 않는 것이 주제를 드러내는 데 어떤 효과를 주는가?",
+    a:"실체가 확인되지 않은 대상에 대한 공포가 사람들을 지배하는 모습을 통해 조작된 위협으로 유지되는 권력의 허구성을 부각한다.",
+    ex:"보이지 않는 위협과 공포 정치의 관계를 설명한다."
+  },
+  {
+    section:"파수꾼",
+    q:"촌장이 '다'에게 사용하는 설득 방식이 합리적인 토론과 다른 점을 서술하시오.",
+    a:"상대의 주장을 동등하게 검토하지 않고 공동체의 질서를 명분으로 회유와 압박을 통해 복종을 유도한다.",
+    ex:"합리적 논증이 아닌 권력관계를 이용한다."
+  },
+  {
+    section:"파수꾼",
+    q:"망루가 갖는 기능을 감시와 정보의 측면에서 설명하시오.",
+    a:"망루는 외부 위협을 감시하는 장소이면서 일부 사람만 정보를 확인할 수 있다는 점에서 정보 통제와 진실에 대한 접근의 차이를 드러낸다.",
+    ex:"물리적 기능과 상징적 의미를 연결한다."
+  },
+  {
+    section:"파수꾼",
+    q:"관객을 마을 사람으로 설정하는 연출이 관객에게 요구하는 태도는?",
+    a:"자신 역시 거짓과 공포를 받아들이는 공동체의 일원이 될 수 있음을 성찰하도록 요구한다.",
+    ex:"관객을 작품 속 문제의 당사자로 참여시킨다."
+  },
+  {
+    section:"파수꾼",
+    q:"촌장이 주장하는 '마을의 평화'와 진정한 평화의 차이를 서술하시오.",
+    a:"촌장의 평화는 공포와 거짓으로 유지되는 표면적 질서인 반면, 진정한 평화는 진실을 바탕으로 구성원들이 자유롭게 판단할 수 있는 상태이다.",
+    ex:"표면적 질서와 자유로운 판단을 대비한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"박준이 직접적인 진술 대신 소설을 통해 자신을 표현하려는 이유를 서술하시오.",
+    a:"직접 진술에는 강요와 검열이 개입할 수 있지만 소설에서는 허구적 형식을 통해 자신의 내면과 경험을 자유롭고 정직하게 드러낼 수 있기 때문이다.",
+    ex:"소설 쓰기와 자기 진술의 자유를 연결한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"전짓불을 비추는 존재의 정체가 불분명하다는 점이 갖는 의미는?",
+    a:"심문하고 판단하는 존재를 알 수 없어 공포가 커지며, 특정 인물을 넘어 정체를 숨긴 억압적 권력 일반을 상징하게 된다.",
+    ex:"권력의 익명성과 공포의 관계가 핵심이다."
+  },
+  {
+    section:"소문의 벽",
+    q:"박준의 소설을 읽는 '나'의 태도를 통해 드러나는 바람직한 독자의 자세는?",
+    a:"겉으로 드러난 내용만 판단하지 않고 작가의 내면과 진술 의도를 이해하려는 공감적이고 열린 태도이다.",
+    ex:"문학을 통한 타인 이해에 주목한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"김 박사의 치료 방식이 오히려 박준의 상태를 악화시킬 수 있는 이유는?",
+    a:"박준이 두려워하는 것이 강요된 자기 진술인데 김 박사는 직접 진술을 요구하여 기존의 공포를 반복시키기 때문이다.",
+    ex:"치료 과정이 기존 억압을 재현한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"'소문'이 확인된 사실보다 더 강한 억압으로 작용할 수 있는 이유는?",
+    a:"사실 여부와 관계없이 평가나 처벌에 대한 두려움을 주어 사람들이 스스로 표현을 제한하게 만들기 때문이다.",
+    ex:"자기 검열이 형성되는 과정을 설명한다."
+  },
+  {
+    section:"소문의 벽",
+    q:"문학 작품을 단순한 허구로만 보는 태도가 지닌 한계를 서술하시오.",
+    a:"허구적 형식에도 작가의 경험과 내면적 진실이 담길 수 있으므로 허구라는 이유로 배제하면 중요한 자기 표현의 의미를 놓친다.",
+    ex:"허구적 형식과 내면적 진실은 양립할 수 있다."
+  },
+  {
+    section:"소문의 벽",
+    q:"'나'가 박준의 문제를 이해하려는 과정이 독자에게 갖는 효과를 서술하시오.",
+    a:"독자는 '나'의 탐색을 따라가며 박준을 단순한 광인으로 판단하지 않고 그 배경에 있는 억압과 진술의 문제를 이해하게 된다.",
+    ex:"서술자의 탐색이 독자의 이해를 심화한다."
+  }
+];
+
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "literatureQuizV1";
+
+let work = "전체";
+let mode = "all";
+let random = false;
+let order = [];
+let index = 0;
+let answers = {};
+let seen = {};
+let grades = {};
+let reviewSeen = {};
+let reviewAnswers = {};
+
+try {
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  answers = saved.answers || {};
+  seen = saved.seen || {};
+  grades = saved.grades || {};
+} catch (error) {
+  console.warn("저장된 기록을 불러오지 못했습니다.", error);
+}
+
+function save() {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ answers, seen, grades })
+    );
+  } catch (error) {
+    console.warn("기록을 저장하지 못했습니다.", error);
+  }
+}
+
+function selectedIds() {
+  return DATA.map((_, i) => i).filter(i =>
+    (work === "전체" || DATA[i].section === work) &&
+    (mode === "all" || grades[i] === "wrong")
+  );
+}
+
+function wrongCount() {
+  return DATA.filter((q, i) =>
+    grades[i] === "wrong" &&
+    (work === "전체" || q.section === work)
+  ).length;
+}
+
+function currentId() {
+  return order[index];
+}
+
+function isRevealed(id) {
+  if (mode === "wrong") {
+    return !!reviewSeen[id];
+  }
+  return !!seen[id] || $("showall").checked;
+}
+
+function updateWorks() {
+  const root = $("works");
+  root.innerHTML = "";
+
+  ["전체", "파수꾼", "소문의 벽"].forEach(name => {
+    const button = document.createElement("button");
+    const count = name === "전체"
+      ? DATA.length
+      : DATA.filter(q => q.section === name).length;
+
+    button.className = "chip" + (work === name ? " active" : "");
+    button.textContent = `${name} (${count})`;
+
+    button.onclick = () => {
+      work = name;
+      updateWorks();
+      makeOrder();
+    };
+
+    root.appendChild(button);
+  });
+}
+
+function makeOrder() {
+  order = selectedIds();
+
+  if (random) {
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+  }
+
+  index = 0;
+  render();
+}
+
+function startReview() {
+  mode = "wrong";
+
+  // 복습을 새로 시작할 때만 답안과 공개 상태 초기화
+  reviewSeen = {};
+  reviewAnswers = {};
+
+  makeOrder();
+}
+
+function render() {
+  $("wrongcount").textContent = wrongCount();
+  $("allmode").classList.toggle("active", mode === "all");
+  $("wrongmode").classList.toggle("active", mode === "wrong");
+
+  $("modeLabel").textContent = mode === "wrong"
+    ? "오답 복습 중 — 정답은 다시 가려집니다."
+    : "";
+
+  const empty = order.length === 0;
+
+  $("empty").classList.toggle("hidden", !empty);
+  $("questionArea").classList.toggle("hidden", empty);
+
+  $("counter").textContent = empty
+    ? "문제 0 / 0"
+    : `문제 ${index + 1} / ${order.length}`;
+
+  $("progress").textContent = `오답 ${wrongCount()}문항`;
+
+  $("fill").style.width = empty
+    ? "0%"
+    : `${(index + 1) / order.length * 100}%`;
+
+  if (empty) {
+    $("tag").textContent = "";
+    $("empty").innerHTML = mode === "wrong"
+      ? "다시 풀 오답이 없어요.<br>전체 문제로 돌아가거나 작품을 변경해 주세요."
+      : "출제할 문제가 없습니다.";
+    return;
+  }
+
+  const id = currentId();
+  const q = DATA[id];
+
+  $("tag").textContent = q.section;
+  $("question").textContent = q.q;
+
+  $("answer").value = mode === "wrong"
+    ? (reviewAnswers[id] || "")
+    : (answers[id] || "");
+
+  $("prev").disabled = index === 0;
+
+  // 마지막 문제라도 정답 확인 후 마무리할 수 있도록 함
+  const last = index === order.length - 1;
+  $("next").disabled = false;
+  $("next").textContent = last ? "학습 마무리 →" : "다음 →";
+
+  const visible = isRevealed(id);
+
+  $("result").classList.toggle("hidden", !visible);
+  $("correct").textContent = "모범 답안: " + q.a;
+  $("explanation").textContent = q.ex;
+
+  $("reveal").textContent = visible
+    ? "정답 확인 완료"
+    : "정답 및 해설 확인";
+
+  // 오답 복습에서는 새로 채점하기 전까지 선택 표시 제거
+  const grade = mode === "wrong" && !reviewSeen[id]
+    ? null
+    : grades[id];
+
+  $("markwrong").classList.toggle("selected", grade === "wrong");
+  $("markright").classList.toggle("selected", grade === "right");
+}
+
+function revealAnswer() {
+  if (!order.length) return;
+
+  const id = currentId();
+
+  if (mode === "wrong") {
+    reviewSeen[id] = true;
+  } else {
+    seen[id] = true;
+    save();
+  }
+
+  render();
+}
+
+function gradeAnswer(value) {
+  if (!order.length) return;
+
+  const id = currentId();
+
+  if (!isRevealed(id)) {
+    revealAnswer();
+  }
+
+  grades[id] = value;
+
+  if (mode === "wrong") {
+    reviewSeen[id] = true;
+  } else {
+    seen[id] = true;
+  }
+
+  save();
+
+  // 채점 직후에는 현재 문제를 유지
+  // Enter를 눌렀을 때 다음 문제로 이동
+  render();
+}
+
+function nextQuestion() {
+  if (!order.length) return;
+
+  const id = currentId();
+
+  // 정답이 공개되지 않았다면 먼저 정답 확인
+  if (!isRevealed(id)) {
+    revealAnswer();
+    return;
+  }
+
+  // 오답 복습에서 맞힌 문제는 다음으로 넘어갈 때 제외
+  if (mode === "wrong" && grades[id] === "right") {
+    order.splice(index, 1);
+
+    if (order.length === 0) {
+      render();
+      return;
+    }
+
+    if (index >= order.length) {
+      index = order.length - 1;
+    }
+
+    render();
+    return;
+  }
+
+  if (index < order.length - 1) {
+    index++;
+    render();
+    return;
+  }
+
+  // 마지막 문제의 학습 마무리
+  if (mode === "wrong") {
+    const remaining = wrongCount();
+
+    if (remaining === 0) {
+      makeOrder();
+    } else {
+      const again = confirm(
+        `오답 ${remaining}문항이 남아 있어요.\n오답 복습을 다시 시작할까요?`
+      );
+
+      if (again) startReview();
+    }
+  } else {
+    alert(
+      `총 ${order.length}문제 학습을 마쳤어요!\n` +
+      `현재 오답 ${wrongCount()}문항이 있어요.`
+    );
+  }
+}
+
+$("answer").addEventListener("input", event => {
+  if (!order.length) return;
+
+  const id = currentId();
+
+  if (mode === "wrong") {
+    reviewAnswers[id] = event.target.value;
+  } else {
+    answers[id] = event.target.value;
+    save();
+  }
+});
+
+$("reveal").onclick = revealAnswer;
+$("markwrong").onclick = () => gradeAnswer("wrong");
+$("markright").onclick = () => gradeAnswer("right");
+
+$("prev").onclick = () => {
+  if (index > 0) {
+    index--;
+    render();
+  }
+};
+
+$("next").onclick = nextQuestion;
+
+$("allmode").onclick = () => {
+  mode = "all";
+  makeOrder();
+};
+
+$("wrongmode").onclick = startReview;
+
+$("ordered").onclick = () => {
+  random = false;
+  $("ordered").classList.add("active");
+  $("random").classList.remove("active");
+  makeOrder();
+};
+
+$("random").onclick = () => {
+  random = true;
+  $("random").classList.add("active");
+  $("ordered").classList.remove("active");
+  makeOrder();
+};
+
+$("showall").onchange = render;
+
+$("reset").onclick = () => {
+  if (!confirm(
+    "입력한 답안, 정답 확인 기록, 오답 표시를 모두 지울까요?"
+  )) return;
+
+  answers = {};
+  seen = {};
+  grades = {};
+  reviewSeen = {};
+  reviewAnswers = {};
+
+  save();
+  makeOrder();
+};
+
+// Enter 단축키
+document.addEventListener("keydown", event => {
   if (
-    event.key !== 'Enter' ||
+    event.key !== "Enter" ||
     event.isComposing ||
     event.repeat ||
     event.shiftKey ||
@@ -46,14 +898,19 @@ document.addEventListener('keydown', function(event) {
 
   event.preventDefault();
 
-  const result = document.getElementById('result');
-  const reveal = document.getElementById('reveal');
-  const next = document.getElementById('next');
+  const id = currentId();
 
-  if (result.classList.contains('hidden')) {
-    reveal.click();
-  } else if (!next.disabled) {
-    next.click();
+  if (!isRevealed(id)) {
+    revealAnswer();
+  } else {
+    nextQuestion();
   }
 });
-</script></body></html>
+
+// 초기 실행
+updateWorks();
+makeOrder();
+</script>
+
+</body>
+</html>
