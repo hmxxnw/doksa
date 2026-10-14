@@ -31,12 +31,29 @@ $('random').onclick=()=>{random=true;$('random').classList.add('active');$('orde
 $('allmode').onclick=()=>{mode='all';makeOrder()};$('wrongmode').onclick=()=>{mode='wrong';makeOrder()};
 $('reset').onclick=()=>{if(confirm('입력한 답안, 정답 확인 기록, 오답 표시를 모두 지울까요?')){answers={};seen={};grades={};save();makeOrder()}};
 workButtons();makeOrder();
-document.addEventListener('keydown',function(event){
- if(event.key!=='Enter'||event.isComposing||event.repeat||event.shiftKey||event.ctrlKey||event.altKey||event.metaKey)return;
- if(event.target instanceof HTMLElement && (event.target.tagName==='BUTTON'||event.target.tagName==='SELECT'))return;
- if(!order.length)return;
- event.preventDefault();
- if($('result').classList.contains('hidden'))$('reveal').click();
- else if(!$('next').disabled)$('next').click();
+document.addEventListener('keydown', function(event) {
+  if (
+    event.key !== 'Enter' ||
+    event.isComposing ||
+    event.repeat ||
+    event.shiftKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.metaKey
+  ) return;
+
+  if (!order.length) return;
+
+  event.preventDefault();
+
+  const result = document.getElementById('result');
+  const reveal = document.getElementById('reveal');
+  const next = document.getElementById('next');
+
+  if (result.classList.contains('hidden')) {
+    reveal.click();
+  } else if (!next.disabled) {
+    next.click();
+  }
 });
 </script></body></html>
