@@ -9,4 +9,47 @@ function makeOrder(){order=DATA.map((_,i)=>i).filter(i=>work==='전체'||DATA[i]
 function workButtons(){const root=$('works');root.innerHTML='';['전체','파수꾼','소문의 벽'].forEach(w=>{const b=document.createElement('button');b.className='chip'+(work===w?' active':'');b.textContent=w+' ('+(w==='전체'?DATA.length:DATA.filter(q=>q.section===w).length)+')';b.onclick=()=>{work=w;workButtons();makeOrder()};root.appendChild(b)})}
 function render(){const id=order[index],q=DATA[id];$('counter').textContent=`문제 ${index+1} / ${order.length}`;$('progress').textContent=`확인 완료 ${order.filter(i=>seen[i]).length}문항`;$('fill').style.width=((index+1)/order.length*100)+'%';$('tag').textContent=q.section;$('question').textContent=q.q;$('answer').value=answers[id]||'';$('prev').disabled=index===0;$('next').disabled=index===order.length-1;const visible=!!seen[id]||$('showall').checked;$('result').classList.toggle('hidden',!visible);$('correct').textContent='모범 답안: '+q.a;$('explanation').textContent=q.ex;$('reveal').textContent=visible?'정답 확인 완료':'정답 및 해설 확인'}
 $('answer').addEventListener('input',e=>{answers[order[index]]=e.target.value;save()});$('reveal').onclick=()=>{seen[order[index]]=true;save();render()};$('prev').onclick=()=>{if(index>0){index--;render()}};$('next').onclick=()=>{if(index<order.length-1){index++;render()}};$('showall').onchange=render;$('ordered').onclick=()=>{random=false;$('ordered').classList.add('active');$('random').classList.remove('active');makeOrder()};$('random').onclick=()=>{random=true;$('random').classList.add('active');$('ordered').classList.remove('active');makeOrder()};$('reset').onclick=()=>{if(confirm('입력한 답안과 정답 확인 기록을 모두 지울까요?')){answers={};seen={};save();index=0;render()}};workButtons();makeOrder();
-</script></body></html>
+</script>
+
+<script>
+document.addEventListener('keydown', function(event) {
+  if (event.key !== 'Enter' || event.isComposing || event.repeat) return;
+
+  const active = document.activeElement;
+
+  // Shift + Enter는 줄바꿈
+  if (event.shiftKey) return;
+
+  // 정답 확인 또는 다음 문제 버튼 찾기
+  const buttons = [...document.querySelectorAll('button')];
+
+  const visible = button =>
+    !button.disabled &&
+    button.getClientRects().length > 0;
+
+  // 다음 문제 버튼이 보이면 우선 클릭
+  const nextButton = buttons.find(button =>
+    visible(button) &&
+    button.textContent.trim().includes('다음 문제')
+  );
+
+  if (nextButton) {
+    event.preventDefault();
+    nextButton.click();
+    return;
+  }
+
+  // 그렇지 않으면 정답 확인
+  const checkButton = buttons.find(button =>
+    visible(button) &&
+    button.textContent.trim().includes('정답 확인')
+  );
+
+  if (checkButton) {
+    event.preventDefault();
+    checkButton.click();
+  }
+});
+</script>
+
+</body></html>
